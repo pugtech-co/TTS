@@ -6,7 +6,7 @@ import math
 from dataclasses import dataclass
 
 import torch
-from torch import nn
+import torch.nn as nn
 from torch.nn import functional as F
 
 from .model import GPT, MLP, GPTConfig

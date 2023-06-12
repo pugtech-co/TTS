@@ -6,8 +6,7 @@ import math
 from dataclasses import dataclass
 
 import torch
-from coqpit import Coqpit
-from torch import nn
+import torch.nn as nn
 from torch.nn import functional as F
 
 
@@ -19,8 +18,8 @@ class LayerNorm(nn.Module):
         self.weight = nn.Parameter(torch.ones(ndim))
         self.bias = nn.Parameter(torch.zeros(ndim)) if bias else None
 
-    def forward(self, x):
-        return F.layer_norm(x, self.weight.shape, self.weight, self.bias, 1e-5)
+    def forward(self, input):
+        return F.layer_norm(input, self.weight.shape, self.weight, self.bias, 1e-5)
 
 
 class CausalSelfAttention(nn.Module):
@@ -132,7 +131,7 @@ class Block(nn.Module):
 
 
 @dataclass
-class GPTConfig(Coqpit):
+class GPTConfig:
     block_size: int = 1024
     input_vocab_size: int = 10_048
     output_vocab_size: int = 10_048
@@ -177,7 +176,7 @@ class GPT(nn.Module):
 
     def forward(self, idx, merge_context=False, past_kv=None, position_ids=None, use_cache=False):
         device = idx.device
-        _, t = idx.size()
+        b, t = idx.size()
         if past_kv is not None:
             assert t == 1
             tok_emb = self.transformer.wte(idx)  # token embeddings of shape (b, t, n_embd)
@@ -219,7 +218,7 @@ class GPT(nn.Module):
 
         new_kv = () if use_cache else None
 
-        for _, (block, past_layer_kv) in enumerate(zip(self.transformer.h, past_kv)):
+        for i, (block, past_layer_kv) in enumerate(zip(self.transformer.h, past_kv)):
             x, kv = block(x, past_kv=past_layer_kv, use_cache=use_cache)
 
             if use_cache:
