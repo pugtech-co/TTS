@@ -51,4 +51,5 @@ einops
 transformers
 #deps for bark
 encodec
+#deps for fairseq models
 fairseq
