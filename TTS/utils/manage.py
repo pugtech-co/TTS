@@ -88,7 +88,7 @@ class ModelManager(object):
 
     def _list_models(self, model_type, model_count=0):
         if self.verbose:
-            print(" Name format: type/language/dataset/model")
+            print("\n Name format: type/language/dataset/model")
         model_list = []
         for lang in self.models_dict[model_type]:
             for dataset in self.models_dict[model_type][lang]:
@@ -309,12 +309,7 @@ class ModelManager(object):
         Args:
             model_name (str): model name as explained above.
         """
-        # fetch model info from the dict
-        model_type, lang, dataset, model = model_name.split("/")
-        model_full_name = f"{model_type}--{lang}--{dataset}--{model}"
-        model_item = self.models_dict[model_type][lang][dataset][model]
-        model_item["model_type"] = model_type
-        model_item = self.set_model_url(model_item)
+        model_item, model_full_name, model = self._set_model_item(model_name)
         # set the model specific output path
         output_path = os.path.join(self.output_prefix, model_full_name)
         if os.path.exists(output_path):
@@ -330,7 +325,7 @@ class ModelManager(object):
                 elif "hf_url" in model_item:
                     self._download_hf_model(model_item, output_path)
 
-            except requests.Exception.RequestException as e:
+            except requests.RequestException as e:
                 print(f" > Failed to download the model file to {output_path}")
                 rmtree(output_path)
                 raise e
