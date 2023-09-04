@@ -259,6 +259,7 @@ class Synthesizer(object):
         reference_speaker_name=None,
         durations=None,
         return_extra_outputs=False,
+        **kwargs,
     ) -> List[int]:
         """🐸 TTS magic. Run all the models and generate speech.
 
@@ -385,6 +386,7 @@ class Synthesizer(object):
                         d_vector=speaker_embedding,
                         language_id=language_id,
                         durations=durations,
+                        **kwargs,
                     )
                 waveform = outputs["wav"]
                 if not use_gl:
